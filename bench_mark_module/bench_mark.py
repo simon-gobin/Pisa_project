@@ -7,9 +7,18 @@ import logging
 from google.cloud.sql.connector import Connector
 import sqlalchemy
 import pandas as pd
+import os
+import sqlalchemy
+import numpy as np
+import pandas as pd
+# import cudf
+from google.cloud.sql.connector import Connector
 
+db_password = os.environ.get("SQL_password")
 
-
+db_password = os.environ.get("SQL_password")
+if db_password is None:
+    raise ValueError("SQL_password environment variable is not set.")
 
 
 class bench_mark:
@@ -41,7 +50,8 @@ class bench_mark:
         self.logger.info(message)
         print(message)  # Commented out to log only to file
 
-    def data_loader(self.query):
+
+    def data_loader(query):
 
         # initialize parameters
         INSTANCE_CONNECTION_NAME = 'pisasql:europe-west2:pisasql'  # i.e demo-project:us-central1:demo-instance
@@ -70,19 +80,21 @@ class bench_mark:
             creator=getconn,
         )
 
-        df = pd.read_sql(self.query, pool)
+        df = pd.read_sql(query, pool)
 
-        for col in df.columns:
+        for col in df.columns:  # pg8000 not respect boolean value need to transforme again
             try:
                 df[col] = df[col].replace({'True': True, 'False': False, 'None': np.nan})
                 df[col] = df[col].astype('boolean')
                 # self.logger.debug(f'{df[col].name}transform as boolean')
             except Exception as e:
-        # self.logger.error(e)
+                # self.logger.error(e)
+                print(e)
         # self.logger.info(df_school_questions.head())
 
-        return df
+        gdf = cudf.from_pandas(df)
 
+        return df
 
 
 
