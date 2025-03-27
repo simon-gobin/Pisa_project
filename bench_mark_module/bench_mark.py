@@ -421,6 +421,7 @@ class bench_mark():
 
             # Train XGBoost model
             model = xgb.XGBRegressor(**params, n_estimators=n_estimators)
+            model.fit(X_train, y_train)
 
             # Predict and calculate accuracy
             preds = model.predict(X_test)
