@@ -41,7 +41,8 @@ class bench_mark():
         self.logger.setLevel(log_level)  # DEBUG or INFO for fewer messages
 
         if not self.logger.handlers:
-            handler = logging.StreamHandler()  # Just print logs to output
+            # Create a rotating file handler: 200 MB per file, up to 5 backups
+            handler = RotatingFileHandler(log_filename, maxBytes=200 * 1024 * 1024, backupCount=5)
             formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
