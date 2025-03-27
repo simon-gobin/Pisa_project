@@ -1,3 +1,4 @@
+from logging.handlers import RotatingFileHandler
 import logging
 import os
 from cuml.model_selection import train_test_split
@@ -18,7 +19,6 @@ from sklearn.metrics import explained_variance_score, median_absolute_error
 from datetime import date
 import json
 from cuml.linear_model import ElasticNet
-from logging.handlers import RotatingFileHandler
 
 
 class bench_mark():
