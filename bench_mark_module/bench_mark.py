@@ -523,9 +523,13 @@ class bench_mark():
         }
 
     def run_all(self):
+        print('Run Random forest')
         self.bayesian_optimization_rf()
+        print('Run SVR')
         self.bayesian_optimization_SVR()
+        print('Run XGBoost')
         self.bayesian_optimization_XGB()
+        print('Run ElasticNet')
         self.bayesian_optimization_ElasticNet()
 
     def summarize_results(self):
