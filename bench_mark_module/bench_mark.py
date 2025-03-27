@@ -56,7 +56,7 @@ class bench_mark():
         print(message)  # Commented out to log only to file
 
     @staticmethod
-    def plot(y_test, y_pred):
+    def plot(y_test, y_pred, model):
         # Compute errors
         errors = y_pred - y_test
         abs_errors = np.abs(errors)
@@ -73,9 +73,9 @@ class bench_mark():
         plt.plot(df_sorted.index, df_sorted['Predicted'], label="Predicted", color='blue', linestyle='dashed',
                  marker='x')
 
-        plt.xlabel("Student Index (Sorted by Score)")
+        plt.xlabel(f"Student Index {model}")
         plt.ylabel("Score")
-        plt.title("Actual vs. Predicted Student Scores (Line Plot)")
+        plt.title(f"Actual vs. Predicted {model}")
         plt.legend()
         plt.show()
 
@@ -84,13 +84,14 @@ class bench_mark():
         plt.figure(figsize=(10, 6))
         sns.boxplot(x=df['Score Bin'], y=df['Error'])
         plt.xticks(rotation=45)
-        plt.xlabel("Student Score Ranges")
+        plt.xlabel(f"{model}")
         plt.ylabel("Absolute Prediction Error")
-        plt.title("Absolute Error Spread by Student Score Range")
+        plt.title(f"Absolute Error Spread {model}")
         plt.show()
 
 
     def bayesian_optimization_ElasticNet(self):
+        model_name= 'ElasticNet'
         def ElasticNet_evaluate(alpha, l1_ratio):
             params = {
                 'alpha': alpha,
@@ -152,7 +153,7 @@ class bench_mark():
             MAPE_met = mean_absolute_errorSK(y_test, y_pred)
             MAE_met = median_absolute_error(y_test, y_pred)
 
-            self.plot(y_test, y_pred)
+            self.plot(y_test, y_pred, model_name)
 
             print(
                 f'Mean squared error = {mean_absolute_error_met:.4f}, R² = {r2_score_met:.4f}, MAPE = {MAPE_met:.4f}, '
@@ -184,6 +185,7 @@ class bench_mark():
         }
 
     def bayesian_optimization_rf(self):
+        model_name = 'Random forest'
         def rf_evaluate(n_estimators, max_depth, max_features):
             params = {
                 'n_estimators': int(n_estimators),
@@ -253,7 +255,7 @@ class bench_mark():
             r2_score_met = explained_variance_score(y_test, y_pred)
             MAPE_met = mean_absolute_errorSK(y_test, y_pred)
             MAE_met = median_absolute_error(y_test, y_pred)
-            self.plot(y_test, y_pred)
+            self.plot(y_test, y_pred, model_name)
 
             print(
                 f'Mean square error = {mean_absolute_error_met:.4f}, r2_score_met = {r2_score_met}, MAPE_met = {MAPE_met}, Mean absoluterror = {MAE_met}, for training time {total_time: .2f}')
@@ -284,6 +286,7 @@ class bench_mark():
         }
 
     def bayesian_optimization_SVR(self):
+        model_name = 'SVR'
         def svr_evaluate(C, epsilon):
             params = {
                 'C': float(C),
@@ -355,7 +358,7 @@ class bench_mark():
             r2_score_met = explained_variance_score(y_test, y_pred)
             MAPE_met = mean_absolute_errorSK(y_test, y_pred)
             MAE_met = median_absolute_error(y_test, y_pred)
-            self.plot(y_test, y_pred)
+            self.plot(y_test, y_pred, model_name)
 
             print(
                 f'Mean square error = {mean_absolute_error_met:.4f}, r2_score_met = {r2_score_met}, MAPE_met = {MAPE_met}, Mean absoluterror = {MAE_met}, for training time {total_time: .2f}')
@@ -386,6 +389,7 @@ class bench_mark():
         }
 
     def bayesian_optimization_XGB(self):
+        model_name = 'XGBoost'
         def XGB_evaluate(n_estimators, max_depth, max_features):
             # Convert float hyperparameters to integers
             max_depth = int(round(max_depth))
@@ -414,18 +418,11 @@ class bench_mark():
             X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
             X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
 
-            # Convert to DMatrix
-            dtrain = xgb.DMatrix(X_train, label=y_train)
-            dtest = xgb.DMatrix(X_test, label=y_test)
-
             # Train XGBoost model
-            model = xgb.train(params, dtrain, num_boost_round=n_estimators,
-                              evals=[(dtrain, 'train')],
-                              early_stopping_rounds=10,
-                              verbose_eval=False)
+            model = xgb.XGBRegressor(**params, n_estimators=n_estimators, tree_method="hist", device="cuda", random_state=42)
 
             # Predict and calculate accuracy
-            preds = model.predict(dtest)
+            preds = model.predict(X_test)
             accuracy = cuml_r2_score(y_test, preds)
             # plot
             plt.bar(range(len(model.feature_importances_)), model.feature_importances_)
@@ -491,7 +488,7 @@ class bench_mark():
             # plot
             plt.bar(range(len(model.feature_importances_)), model.feature_importances_)
             plt.show()
-            self.plot(y_test, y_pred)
+            self.plot(y_test, y_pred, model_name)
 
             print(
                 f'Mean squared error = {mean_absolute_error_met:.4f}, R² = {r2_score_met:.4f}, RMSE = {MAPE_met:.4f}, Median AE = {MAE_met:.4f}, Training Time = {total_time:.2f}s')
