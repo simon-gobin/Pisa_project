@@ -10,3 +10,5 @@ seaborn>=0.12
 SQLAlchemy>=2.0
 sqlalchemy-utils>=0.41
 xgboost>=1.7
+loguru>=0.6.0
+google-cloud-logging>=3.0.0
