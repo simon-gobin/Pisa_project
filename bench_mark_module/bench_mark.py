@@ -404,6 +404,7 @@ class bench_mark():
             params = {
                 'tree_method': "hist",
                 'device': "cuda",
+                'random_state' : 42,
                 'max_depth': max_depth,
                 'learning_rate': learning_rate,
                 'subsample': subsample,
@@ -419,7 +420,7 @@ class bench_mark():
             X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
 
             # Train XGBoost model
-            model = xgb.XGBRegressor(**params, n_estimators=n_estimators, tree_method="hist", device="cuda", random_state=42)
+            model = xgb.XGBRegressor(**params, n_estimators=n_estimators)
 
             # Predict and calculate accuracy
             preds = model.predict(X_test)
