@@ -24,10 +24,11 @@ from cuml.linear_model import ElasticNet
 class bench_mark():
 
 
-    def __init__(self, X, y, log_level=logging.INFO):
+    def __init__(self, X, y, log_level=logging.INFO, top_n=15):
 
         self.X = X
         self.y = y
+        self.top_n = top_n
 
         # Configure logging
         project_root = os.path.dirname(os.path.abspath(__file__))
@@ -427,15 +428,24 @@ class bench_mark():
             preds = model.predict(X_test)
             accuracy = cuml_r2_score(y_test, preds)
 
+            # Make sure the model is fitted before calling get_booster
+            booster = model.get_booster()
 
-            # Plot feature importance with feature names
-            top_n = 10
-            fig, ax = plt.subplots(figsize=(10, 6))
-            xgb.plot_importance(model, ax=ax, importance_type='gain',
-                                max_num_features=top_n, show_values=False)
-            plt.yticks(range(top_n), model.feature_names[:top_n])
-            plt.xlabel('Gain')
-            plt.title(f'Top {top_n} Most Important Features')
+            # Plot top N features by importance (gain)
+
+            plt.figure(figsize=(10, 6))
+            ax = xgb.plot_importance(
+                booster,
+                importance_type='gain',  # Or 'weight' or 'cover'
+                max_num_features= self.top_n,
+                height=0.4,
+                show_values=True,
+                values_format="{v:.2f}",
+                xlabel='Gain',
+                title=f'Top {self.top_n} Important Features (Gain)',
+                grid=True
+            )
+            plt.tight_layout()
             plt.show()
 
             # Penalization for training time
@@ -496,14 +506,23 @@ class bench_mark():
             MAPE_met = mean_absolute_errorSK(y_test, y_pred)
             MAE_met = median_absolute_error(y_test, y_pred)
             # plot
-            # Plot feature importance with feature names
-            top_n = 10
-            fig, ax = plt.subplots(figsize=(10, 6))
-            xgb.plot_importance(model, ax=ax, importance_type='gain',
-                                max_num_features=top_n, show_values=False)
-            plt.yticks(range(top_n), model.feature_names[:top_n])
-            plt.xlabel('Gain')
-            plt.title(f'Top {top_n} Most Important Features')
+            # Make sure the model is fitted before calling get_booster
+            booster = model.get_booster()
+
+            # Plot top N features by importance (gain)
+            plt.figure(figsize=(10, 6))
+            ax = xgb.plot_importance(
+                booster,
+                importance_type='gain',  # Or 'weight' or 'cover'
+                max_num_features= self.top_n,
+                height=0.4,
+                show_values=True,
+                values_format="{v:.2f}",
+                xlabel='Gain',
+                title=f'Top {self.top_n} Important Features (Gain)',
+                grid=True
+            )
+            plt.tight_layout()
             plt.show()
             self.plot(y_test, y_pred, model_name)
 
