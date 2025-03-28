@@ -7,6 +7,7 @@ import cudf
 from cuml.preprocessing import LabelEncoder as gpu_encoder
 from google.cloud.sql.connector import Connector
 from google.colab import auth
+from getpass import getpass
 
 
 class loader:
@@ -14,7 +15,7 @@ class loader:
         self.X_query = X_query
         self.y_query = y_query
         self.index = index
-        self.db_password = db_password or input('enter DB password: ')
+        self.db_password = db_password or getpass()
         self.chunksize = chunksize
         auth.authenticate_user()
 
