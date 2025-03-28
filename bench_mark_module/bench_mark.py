@@ -426,8 +426,16 @@ class bench_mark():
             # Predict and calculate accuracy
             preds = model.predict(X_test)
             accuracy = cuml_r2_score(y_test, preds)
-            # plot
-            plt.bar(range(len(model.feature_importances_)), model.feature_importances_)
+
+
+            # Plot feature importance with feature names
+            top_n = 10
+            fig, ax = plt.subplots(figsize=(10, 6))
+            xgb.plot_importance(model, ax=ax, importance_type='gain',
+                                max_num_features=top_n, show_values=False)
+            plt.yticks(range(top_n), model.feature_names[:top_n])
+            plt.xlabel('Gain')
+            plt.title(f'Top {top_n} Most Important Features')
             plt.show()
 
             # Penalization for training time
@@ -488,7 +496,14 @@ class bench_mark():
             MAPE_met = mean_absolute_errorSK(y_test, y_pred)
             MAE_met = median_absolute_error(y_test, y_pred)
             # plot
-            plt.bar(range(len(model.feature_importances_)), model.feature_importances_)
+            # Plot feature importance with feature names
+            top_n = 10
+            fig, ax = plt.subplots(figsize=(10, 6))
+            xgb.plot_importance(model, ax=ax, importance_type='gain',
+                                max_num_features=top_n, show_values=False)
+            plt.yticks(range(top_n), model.feature_names[:top_n])
+            plt.xlabel('Gain')
+            plt.title(f'Top {top_n} Most Important Features')
             plt.show()
             self.plot(y_test, y_pred, model_name)
 
