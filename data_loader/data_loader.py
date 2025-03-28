@@ -9,7 +9,7 @@ from google.cloud.sql.connector import Connector
 from google.colab import auth
 
 
-class DataLoader:
+class loader:
     def __init__(self, X_query, y_query, index='Intl_School_ID', db_password=None, chunksize= 20000): # Intl_School_ID : school Intl_Student_ID:student
         self.X_query = X_query
         self.y_query = y_query
@@ -101,5 +101,6 @@ class DataLoader:
         # Debugging: Check object-type columns
         print("Object-type columns:", X_full.select_dtypes(include='object').columns)
         print("Total object-type columns:", len(X_full.select_dtypes(include='object').columns))
+        print('finish')
 
         return X, y
