@@ -94,8 +94,8 @@ class loader:
 
         # Merge data frame to be sure have same lengh
         df = cudf.merge(X_full, y, left_on=self.index, right_on=self.index, how='inner')
-        y = df['avg_composite_percentile']
-        X = df.drop(columns=['avg_composite_percentile'])
+        y = df['composite_percentile']
+        X = df.drop(columns=['composite_percentile'])
 
         connector.close()
 
