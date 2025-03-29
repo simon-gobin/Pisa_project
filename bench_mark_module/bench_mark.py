@@ -420,17 +420,18 @@ class bench_mark():
             # Train/Test Split
             X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, test_size=0.33, random_state=42)
 
-            dups = X_train.columns[X_train.columns.duplicated()].tolist()
-            if dups:
-                print("❗ Duplicated columns dropped:", dups)
-
-
-            X_train = X_train.loc[:, ~X_train.columns.duplicated()]
-            X_test = X_test.loc[:, ~X_test.columns.duplicated()]
 
             # Ensure column names are valid strings
             X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
             X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
+
+            dups = X_train.columns[X_train.columns.duplicated()].tolist()
+            if dups:
+                print("❗ Duplicated columns dropped:", dups)
+
+            X_train = X_train.loc[:, ~X_train.columns.duplicated()]
+            X_test = X_test.loc[:, ~X_test.columns.duplicated()]
+
 
             # Train XGBoost model
             model = xgb.XGBRegressor(**params, n_estimators=n_estimators)
@@ -481,6 +482,10 @@ class bench_mark():
             # Split the data into train and test
             X_train, X_test = X_pandas.iloc[train_index], X_pandas.iloc[test_index]
             y_train, y_test = y_pandas.iloc[train_index], y_pandas.iloc[test_index]
+
+            dups = X_train.columns[X_train.columns.duplicated()].tolist()
+            if dups:
+                print("❗ Duplicated columns dropped:", dups)
 
             X_train = X_train.loc[:, ~X_train.columns.duplicated()]
             X_test = X_test.loc[:, ~X_test.columns.duplicated()]
