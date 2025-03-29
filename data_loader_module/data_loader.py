@@ -8,16 +8,41 @@ from cuml.preprocessing import LabelEncoder as gpu_encoder
 from google.cloud.sql.connector import Connector
 from google.colab import auth
 from getpass import getpass
+from datetime import date
+from logging.handlers import RotatingFileHandler
+import logging
 
 
 class loader:
-    def __init__(self, X_query, y_query, index='Intl_School_ID', db_password=None, chunksize= 20000): # Intl_School_ID : school Intl_Student_ID:student
+    def __init__(self, X_query, y_query, log_level=logging.INFO, index='Intl_School_ID', db_password=None, chunksize= 20000): # Intl_School_ID : school Intl_Student_ID:student
         self.X_query = X_query
         self.y_query = y_query
         self.index = index
         self.db_password = db_password or getpass()
         self.chunksize = chunksize
         auth.authenticate_user()
+
+        # Configure logging
+        project_root = os.path.dirname(os.path.abspath(__file__))
+        log_dir = os.path.join(project_root, "logs")
+        if not os.path.isdir(log_dir):
+            os.makedirs(log_dir)
+
+
+        log_filename = os.path.join(log_dir, f"benchmark_debug_{date.today()}.log")
+        self.logger = logging.getLogger('ETLLogger')
+        self.logger.setLevel(log_level)  # DEBUG or INFO for fewer messages
+
+        if not self.logger.handlers:
+            # Create a rotating file handler: 200 MB per file, up to 5 backups
+            handler = RotatingFileHandler(log_filename, maxBytes=200 * 1024 * 1024, backupCount=5)
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+
+
+        self.logger.info("ETL instance created.")
+        self.results = {}
 
     def load(self):
         X_full = None
@@ -60,7 +85,7 @@ class loader:
 
             duplicates = chunk.columns[chunk.columns.duplicated()].tolist()
             if duplicates:
-                print(f" Dropping duplicated columns: {duplicates}")
+                self.logger.error(f" Dropping duplicated columns: {duplicates}")
                 chunk = chunk.loc[:, ~chunk.columns.duplicated()]
 
             # Convert boolean-like strings to actual boolean
@@ -70,7 +95,7 @@ class loader:
                 try:
                     chunk[col] = chunk[col].astype('boolean')
                 except Exception as e:
-                    print(f"Skipping boolean conversion for {col}: {e}")
+                    self.logger.info(f"Skipping boolean conversion for {col}: {e}")
 
             # Convert to cuDF (GPU DataFrame)
             chunk = cudf.from_pandas(chunk)
