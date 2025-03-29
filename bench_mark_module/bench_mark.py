@@ -420,19 +420,16 @@ class bench_mark():
             # Train/Test Split
             X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, test_size=0.33, random_state=42)
 
-
-            # Ensure column names are valid strings
-            X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
-            X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
-
+            # Drop duplicated columns first
             dups = X_train.columns[X_train.columns.duplicated()].tolist()
-
             if dups:
                 print("❗ Duplicated columns dropped:", dups)
-
             X_train = X_train.loc[:, ~X_train.columns.duplicated()]
             X_test = X_test.loc[:, ~X_test.columns.duplicated()]
 
+            # THEN sanitize the names
+            X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
+            X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
 
             # Train XGBoost model
             model = xgb.XGBRegressor(**params, n_estimators=n_estimators)
@@ -484,17 +481,16 @@ class bench_mark():
             X_train, X_test = X_pandas.iloc[train_index], X_pandas.iloc[test_index]
             y_train, y_test = y_pandas.iloc[train_index], y_pandas.iloc[test_index]
 
-
-            # Ensure column names are valid strings
-            X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
-            X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
-
+            # Drop duplicated columns first
             dups = X_train.columns[X_train.columns.duplicated()].tolist()
             if dups:
                 print("❗ Duplicated columns dropped:", dups)
-
             X_train = X_train.loc[:, ~X_train.columns.duplicated()]
             X_test = X_test.loc[:, ~X_test.columns.duplicated()]
+
+            # THEN sanitize the names
+            X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
+            X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
 
             # Retrain model with best hyperparameters
             model = xgb.XGBRegressor(**best_params, tree_method="hist", device="cuda", random_state=42)
