@@ -58,6 +58,11 @@ class loader:
         # Process `X` in chunks
         for chunk in pd.read_sql(self.X_query, pool, chunksize=self.chunksize):
 
+            duplicates = chunk.columns[chunk.columns.duplicated()].tolist()
+            if duplicates:
+                print(f" Dropping duplicated columns: {duplicates}")
+                chunk = chunk.loc[:, ~chunk.columns.duplicated()]
+
             # Convert boolean-like strings to actual boolean
             for col in chunk.columns:
                 chunk[col] = chunk[col].replace({'True': True, 'False': False, 'None': np.nan})
