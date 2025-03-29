@@ -420,6 +420,11 @@ class bench_mark():
             # Train/Test Split
             X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, test_size=0.33, random_state=42)
 
+            dups = X_train.columns[X_train.columns.duplicated()].tolist()
+            if dups:
+                print("❗ Duplicated columns dropped:", dups)
+
+
             X_train = X_train.loc[:, ~X_train.columns.duplicated()]
             X_test = X_test.loc[:, ~X_test.columns.duplicated()]
 
