@@ -24,11 +24,12 @@ from cuml.linear_model import ElasticNet
 class bench_mark():
 
 
-    def __init__(self, X, y, log_level=logging.INFO, top_n=15):
+    def __init__(self, X, y, log_level=logging.INFO, top_n=15, model_penalty = 0.05):
 
         self.X = X
         self.y = y
         self.top_n = top_n
+        self.model_penalty = model_penalty
 
         # Configure logging
         project_root = os.path.dirname(os.path.abspath(__file__))
@@ -108,9 +109,11 @@ class bench_mark():
             y_pred = model.predict(X_test)
             accuracy = cuml_r2_score(y_test, y_pred)
 
+            # Penalization for training time
             total_time = time.time() - start_time_total
+            score = accuracy - (self.model_penalty * total_time)
             print(f'Accuracy = {accuracy:.4f} for training time {total_time:.2f}s')
-            return accuracy
+            return score
 
         # Define parameter bounds
         param_bounds = {
@@ -206,8 +209,9 @@ class bench_mark():
 
             # Penalization for training time
             total_time = time.time() - start_time_total
+            score = accuracy - (self.model_penalty * total_time)
             print(f'Accuracy = {accuracy:.4f} for training time {total_time: .2f}')
-            return accuracy
+            return score
 
         # Define parameter bounds for Bayesian Optimization
         param_bounds = {
@@ -307,11 +311,11 @@ class bench_mark():
             # Predict and calculate accuracy
             y_pred = model.predict(X_test)
             accuracy = cuml_r2_score(y_test, y_pred)
-
             # Penalization for training time
             total_time = time.time() - start_time_total
+            score = accuracy - (self.model_penalty * total_time)
             print(f'Accuracy = {accuracy:.4f} for training time {total_time: .2f}')
-            return accuracy
+            return score
 
         # Define parameter bounds for Bayesian Optimization
         param_bounds = {
@@ -431,31 +435,13 @@ class bench_mark():
             preds = model.predict(X_test)
             accuracy = cuml_r2_score(y_test, preds)
 
-            # Make sure the model is fitted before calling get_booster
-            booster = model.get_booster()
-
-            # Plot top N features by importance (gain)
-
-            plt.figure(figsize=(10, 6))
-            ax = xgb.plot_importance(
-                booster,
-                importance_type='gain',  # Or 'weight' or 'cover'
-                max_num_features= self.top_n,
-                height=0.4,
-                show_values=True,
-                values_format="{v:.2f}",
-                xlabel='Gain',
-                title=f'Top {self.top_n} Important Features (Gain)',
-                grid=True
-            )
-            plt.tight_layout()
-            plt.show()
 
             # Penalization for training time
             total_time = time.time() - start_time_total
+            score = accuracy - (self.model_penalty * total_time)
             print(f'R² = {accuracy:.4f} for training time {total_time:.2f}')
 
-            return accuracy
+            return score
 
         # Define parameter bounds for Bayesian Optimization
         param_bounds = {
