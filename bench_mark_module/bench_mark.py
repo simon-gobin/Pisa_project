@@ -426,6 +426,7 @@ class bench_mark():
             X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
 
             dups = X_train.columns[X_train.columns.duplicated()].tolist()
+
             if dups:
                 print("❗ Duplicated columns dropped:", dups)
 
@@ -483,16 +484,17 @@ class bench_mark():
             X_train, X_test = X_pandas.iloc[train_index], X_pandas.iloc[test_index]
             y_train, y_test = y_pandas.iloc[train_index], y_pandas.iloc[test_index]
 
+
+            # Ensure column names are valid strings
+            X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
+            X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
+
             dups = X_train.columns[X_train.columns.duplicated()].tolist()
             if dups:
                 print("❗ Duplicated columns dropped:", dups)
 
             X_train = X_train.loc[:, ~X_train.columns.duplicated()]
             X_test = X_test.loc[:, ~X_test.columns.duplicated()]
-
-            # Ensure column names are valid strings
-            X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
-            X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
 
             # Retrain model with best hyperparameters
             model = xgb.XGBRegressor(**best_params, tree_method="hist", device="cuda", random_state=42)
@@ -558,12 +560,12 @@ class bench_mark():
         }
 
     def run_all(self):
+        print('Run XGBoost')
+        self.bayesian_optimization_XGB()
         print('Run Random forest')
         self.bayesian_optimization_rf()
         print('Run SVR')
         self.bayesian_optimization_SVR()
-        print('Run XGBoost')
-        self.bayesian_optimization_XGB()
         print('Run ElasticNet')
         self.bayesian_optimization_ElasticNet()
 
