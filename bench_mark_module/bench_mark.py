@@ -668,6 +668,8 @@ class bench_mark():
         }
 
     def run_all(self):
+        print('Run EDA')
+        self.EDA()
         print('Run XGBoost')
         self.bayesian_optimization_XGB()
         print('Run Random forest')
