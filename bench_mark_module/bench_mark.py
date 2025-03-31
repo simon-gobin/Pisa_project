@@ -112,16 +112,16 @@ class bench_mark():
         plt.figure(figsize=(62, 10))
 
         plt.subplot(3, 1, 1)
-        sns.barplot(y='f_values', x=top_features_fvalues, data=df_top)
+        sns.barplot(y='f_values', x=df_top, data=df_top)
         plt.title('P-values of Features')
 
         plt.subplot(3, 1, 2)
-        sns.barplot(y='Correlation', x=top_features_corr, data=df_top)
+        sns.barplot(y='Correlation', x=df_top, data=df_top)
         plt.title('Correlation of Features with Target')
 
 
         plt.subplot(3, 1, 3)
-        sns.barplot(y='Mutual info', x=top_features_mutual_info, data=df_top)
+        sns.barplot(y='Mutual info', x=df_top, data=df_top)
         plt.title('Importance Decision Tree')
 
         plt.tight_layout()
