@@ -91,6 +91,7 @@ class bench_mark():
         num_features = len(X_panda.columns)
         top_percent_cutoff = int(self.top_features * num_features)
 
+        #filter the result for the plot
         top_features_mutual_info = results_df.nlargest(top_percent_cutoff, 'Mutual_info')['Feature'].tolist()
         top_features_corr = results_df.nlargest(top_percent_cutoff, 'Correlation abs')['Feature'].tolist()
         top_features_fvalues = results_df.nlargest(top_percent_cutoff, 'f_values')['Feature'].tolist()
