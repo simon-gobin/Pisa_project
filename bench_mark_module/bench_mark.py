@@ -98,6 +98,8 @@ class bench_mark():
         # Combine all top features into one list and remove duplicates
         top_features = list(set(top_features_mutual_info  + top_features_corr + top_features_fvalues))
 
+        df_top = results_df[top_features]
+
         # Print the combined list of top features
         logging.info(f'Combined list of unique top features: {top_features}')
 
@@ -110,29 +112,25 @@ class bench_mark():
         plt.figure(figsize=(62, 10))
 
         plt.subplot(3, 1, 1)
-        sns.barplot(y='f_values', x=top_features_fvalues, data=results_df)
+        sns.barplot(y='f_values', x=top_features_fvalues, data=df_top)
         plt.title('P-values of Features')
 
         plt.subplot(3, 1, 2)
-        sns.barplot(y='Correlation', x=top_features_corr, data=results_df)
+        sns.barplot(y='Correlation', x=top_features_corr, data=df_top)
         plt.title('Correlation of Features with Target')
 
 
         plt.subplot(3, 1, 3)
-        sns.barplot(y='Mutual info', x=top_features_mutual_info, data=results_df)
+        sns.barplot(y='Mutual info', x=top_features_mutual_info, data=df_top)
         plt.title('Importance Decision Tree')
 
         plt.tight_layout()
         plt.show()
         plt.savefig('mutliplot_3.jpg')
 
-        # Filter X to top correlated features
-        top_corr_df = self.X[top_features_corr].to_pandas()
-        # Compute correlation matrix
-        corr_matrix = top_corr_df.corr()
         # Plot the heatmap
         plt.figure(figsize=(15, 12))
-        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0, fmt=".2f")
+        sns.heatmap(df_top, annot=True, cmap='coolwarm', center=0, fmt=".2f")
         plt.title("Feature Correlation Heatmap (Top Correlated Features)")
         plt.show()
 
