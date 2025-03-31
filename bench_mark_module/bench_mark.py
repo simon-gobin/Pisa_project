@@ -136,8 +136,10 @@ class bench_mark():
         if self.PCA is True:
             scaler = StandardScaler()
             X_scaled = scaler.fit_transform(self.X)
+
             pca = PCA()
             pca.fit(X_scaled)
+            explained_variance = pca.explained_variance_ratio_
             explained_variance = cp.asarray(explained_variance.values)
 
             # Plot
@@ -153,7 +155,7 @@ class bench_mark():
 
             pca = PCA(n_components=0.95)
             self.X = pca.fit_transform(X_scaled)
-            self.logger.info(f" PCA reduced to {X_pca.shape[1]} components...")
+            self.logger.info(f"PCA reduced to {self.X.shape[1]} components...")
 
         return self.X
 
