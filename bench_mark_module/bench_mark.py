@@ -103,8 +103,8 @@ class bench_mark():
         # Print the combined list of top features
         logging.info(f'Combined list of unique top features: {top_features}')
 
-        with open("top_features.json", "w") as f:
-            json.dump(top_features, f, indent=4)
+        with open("df_top.json", "w") as f:
+            json.dump(df_top, f, indent=4)
 
 
 
