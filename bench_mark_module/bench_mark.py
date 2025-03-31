@@ -20,16 +20,28 @@ from datetime import date
 import json
 from cuml.linear_model import ElasticNet
 
+from sklearn.feature_selection import (f_regression, r_regression, mutual_info_regression)
+
+from cuml.decomposition import PCA
+from cuml.preprocessing import StandardScaler
+
 
 class bench_mark():
 
 
-    def __init__(self, X, y, log_level=logging.INFO, top_n=15, model_penalty = 0.05):
+    def __init__(self, X, y, top_feature_percent = 1, log_level=logging.INFO, top_n=15, model_penalty = 0.05, top_feature_reduction = False, PCA = False):
 
         self.X = X
         self.y = y
         self.top_n = top_n
         self.model_penalty = model_penalty
+        self.top_features = top_feature_percent
+        self.top_feature_reduction = top_feature_reduction
+        self.PCA = PCA
+
+        if self.PCA == True and self.top_feature_reduction == True:
+            self.logger.error('ERROR : PCA and feature reduction are both enabled')
+            print('PCA and feature reduction are both enabled')
 
         # Configure logging
         project_root = os.path.dirname(os.path.abspath(__file__))
@@ -58,6 +70,103 @@ class bench_mark():
         #print(message)  # Commented out to log only to file
 
     def EDA(self):
+        f_values, P_value = f_regression(self.X, self.y)
+        mutual_info = mutual_info_regression(self.X, self.y)
+        Correlation = r_regression(self.X, self.y)
+
+        # Create a DataFrame from the results
+        results_df = pd.DataFrame({
+            'Feature': self.X.columns,
+            'P_value': P_value,
+            'f_values': f_values,
+            'Correlation': Correlation,
+            'Correlation abs' : abs(Correlation),
+            'Mutual_info': mutual_info
+        })
+
+        # Sort and get top Correlation
+        num_features = len(self.X.columns)
+        top_percent_cutoff = int(self.top_features * num_features)
+
+        # Top by ANOVA statistic
+        top_features_mutual_info = results_df.nlargest(top_percent_cutoff, 'Mutual_info')[
+            'Feature'].to_arrow().to_pylist()
+
+        # Top by absolute Correlation
+        top_features_corr = results_df.nlargest(top_percent_cutoff, 'Correlation abs')[
+            'Feature'].to_arrow().to_pylist()
+
+        # Top by f-values
+        top_features_fvalues = results_df.nlargest(top_percent_cutoff, 'f_values')['Feature'].to_arrow().to_pylist()
+
+        # Combine all top features into one list and remove duplicates
+        top_features = list(set(top_features_mutual_info  + top_features_corr + top_features_fvalues))
+
+        # Print the combined list of top features
+        logging.info(f'Combined list of unique top features: {top_features}')
+
+        with open("top_features.json", "w") as f:
+            json.dump(top_features, f, indent=4)
+
+
+
+        #plot
+        plt.figure(figsize=(62, 10))
+
+        plt.subplot(3, 1, 1)
+        sns.barplot(y='f_values', x=top_features_fvalues, data=results_df)
+        plt.title('P-values of Features')
+
+        plt.subplot(3, 1, 2)
+        sns.barplot(y='Correlation', x=top_features_corr, data=results_df)
+        plt.title('Correlation of Features with Target')
+
+
+        plt.subplot(3, 1, 3)
+        sns.barplot(y='Mutual info', x=top_features_mutual_info, data=results_df)
+        plt.title('Importance Decision Tree')
+
+        plt.tight_layout()
+        plt.show()
+        plt.savefig('mutliplot_3.jpg')
+
+        # Filter X to top correlated features
+        top_corr_df = self.X[top_features_corr].to_pandas()
+        # Compute correlation matrix
+        corr_matrix = top_corr_df.corr()
+        # Plot the heatmap
+        plt.figure(figsize=(15, 12))
+        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0, fmt=".2f")
+        plt.title("Feature Correlation Heatmap (Top Correlated Features)")
+        plt.show()
+
+        if self.top_feature_reduction is True:
+            self.X = self.X[top_features]
+
+        if self.PCA is True:
+            scaler = StandardScaler()
+            X_scaled = scaler.fit_transform(self.X)
+            pca = PCA()
+            pca.fit(X_scaled)
+            explained_variance = pca.explained_variance_ratio_
+
+            # Plot
+            plt.figure(figsize=(10, 6))
+            plt.plot(cp.asnumpy(cp.cumsum(explained_variance)), marker='o')
+            plt.grid(axis="both")
+            plt.xlabel("Principal Components")
+            plt.ylabel("Cumulative Explained Variance")
+            plt.title("Cumulative Explained Variance by Principal Components")
+            sns.despine()
+            plt.tight_layout()
+            plt.show()
+
+            pca = PCA(n_components=0.95)
+            self.X = pca.fit_transform(X_scaled)
+            self.logger.info(f" PCA reduced to {X_pca.shape[1]} components...")
+
+        return self.X
+
 
 
     @staticmethod
