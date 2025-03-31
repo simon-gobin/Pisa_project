@@ -70,9 +70,12 @@ class bench_mark():
         #print(message)  # Commented out to log only to file
 
     def EDA(self):
-        f_values, P_value = f_regression(self.X, self.y)
-        mutual_info = mutual_info_regression(self.X, self.y)
-        Correlation = r_regression(self.X, self.y)
+        X_panda = self.X.to_pandas()
+        y_panda = self.y.to_pandas()
+
+        f_values, P_value = f_regression(X_panda, y_panda)
+        mutual_info = mutual_info_regression(X_panda, y_panda)
+        Correlation = r_regression(X_panda, y_panda)
 
         # Create a DataFrame from the results
         results_df = pd.DataFrame({
@@ -85,20 +88,12 @@ class bench_mark():
         })
 
         # Sort and get top Correlation
-        num_features = len(self.X.columns)
+        num_features = len(X_panda.columns)
         top_percent_cutoff = int(self.top_features * num_features)
 
-        # Top by ANOVA statistic
-        top_features_mutual_info = results_df.nlargest(top_percent_cutoff, 'Mutual_info')[
-            'Feature'].to_arrow().to_pylist()
-
-        # Top by absolute Correlation
-        top_features_corr = results_df.nlargest(top_percent_cutoff, 'Correlation abs')[
-            'Feature'].to_arrow().to_pylist()
-
-        # Top by f-values
-        top_features_fvalues = results_df.nlargest(top_percent_cutoff, 'f_values')['Feature'].to_arrow().to_pylist()
-
+        top_features_mutual_info = results_df.nlargest(top_percent_cutoff, 'Mutual_info')['Feature'].tolist()
+        top_features_corr = results_df.nlargest(top_percent_cutoff, 'Correlation abs')['Feature'].tolist()
+        top_features_fvalues = results_df.nlargest(top_percent_cutoff, 'f_values')['Feature'].tolist()
         # Combine all top features into one list and remove duplicates
         top_features = list(set(top_features_mutual_info  + top_features_corr + top_features_fvalues))
 
