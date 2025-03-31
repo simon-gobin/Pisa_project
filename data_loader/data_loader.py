@@ -4,7 +4,6 @@ import sqlalchemy
 import numpy as np
 import pandas as pd
 import cudf
-import cupy as cp
 from cuml.preprocessing import LabelEncoder as gpu_encoder
 from google.cloud.sql.connector import Connector
 from google.colab import auth

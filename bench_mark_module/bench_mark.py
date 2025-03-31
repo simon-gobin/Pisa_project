@@ -19,7 +19,7 @@ from sklearn.metrics import explained_variance_score, median_absolute_error
 from datetime import date
 import json
 from cuml.linear_model import ElasticNet
-
+import cupy as cp
 from sklearn.feature_selection import (f_regression, r_regression, mutual_info_regression)
 
 from cuml.decomposition import PCA
