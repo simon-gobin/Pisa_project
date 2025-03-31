@@ -138,7 +138,7 @@ class bench_mark():
             X_scaled = scaler.fit_transform(self.X)
             pca = PCA()
             pca.fit(X_scaled)
-            explained_variance = pca.explained_variance_ratio_
+            explained_variance = cp.asarray(explained_variance.values)
 
             # Plot
             plt.figure(figsize=(10, 6))
