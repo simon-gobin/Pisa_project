@@ -121,7 +121,7 @@ class bench_mark():
 
 
         plt.subplot(3, 1, 3)
-        sns.barplot(y='Mutual info', x='Feature', data=df_top)
+        sns.barplot(y='Mutual_info', x='Feature', data=df_top)
         plt.title('Importance Decision Tree')
 
         plt.tight_layout()
