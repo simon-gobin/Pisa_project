@@ -98,7 +98,7 @@ class bench_mark():
         # Combine all top features into one list and remove duplicates
         top_features = list(set(top_features_mutual_info  + top_features_corr + top_features_fvalues))
 
-        df_top = results_df[top_features]
+        df_top = results_df[results_df['Feature'].isin(top_features)].copy()
 
         # Print the combined list of top features
         logging.info(f'Combined list of unique top features: {top_features}')
