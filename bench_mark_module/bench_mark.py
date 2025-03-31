@@ -103,27 +103,22 @@ class bench_mark():
         with open("top_features.json", "w") as f:
             json.dump(top_features, f, indent=4)
 
-        # Filter results_df for only top features (f-values example)
-        filtered_df_fval = results_df[results_df['Feature'].isin(top_features_fvalues)]
-        filtered_df_corr = results_df[results_df['Feature'].isin(top_features_corr)]
-        filtered_df_mi = results_df[results_df['Feature'].isin(top_features_mutual_info)]
-
 
 
         #plot
         plt.figure(figsize=(62, 10))
 
         plt.subplot(3, 1, 1)
-        sns.barplot(y='f_values', x=top_features_fvalues, data=filtered_df_fval)
+        sns.barplot(y='f_values', x=top_features_fvalues, data=results_df)
         plt.title('P-values of Features')
 
         plt.subplot(3, 1, 2)
-        sns.barplot(y='Correlation', x=top_features_corr, data=filtered_df_corr)
+        sns.barplot(y='Correlation', x=top_features_corr, data=results_df)
         plt.title('Correlation of Features with Target')
 
 
         plt.subplot(3, 1, 3)
-        sns.barplot(y='Mutual_info', x=top_features_mutual_info, data=filtered_df_mi)
+        sns.barplot(y='Mutual info', x=top_features_mutual_info, data=results_df)
         plt.title('Importance Decision Tree')
 
         plt.tight_layout()
