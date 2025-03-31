@@ -55,7 +55,10 @@ class bench_mark():
 
     def log(self, message):
         self.logger.info(message)
-        print(message)  # Commented out to log only to file
+        #print(message)  # Commented out to log only to file
+
+    def EDA(self):
+
 
     @staticmethod
     def plot(y_test, y_pred, model):
@@ -395,6 +398,19 @@ class bench_mark():
 
     def bayesian_optimization_XGB(self):
         model_name = 'XGBoost'
+        # Create name mapping before renaming
+        column_name_map = {
+            col: f"col_{i}" for i, col in enumerate(self.X.columns)
+        }
+
+
+        # Rename columns using the map
+        self.X_renamed = self.X.rename(columns=column_name_map)
+
+        # Save the reversed map for later (used for plotting)
+        reverse_column_map = {v: k for k, v in column_name_map.items()}
+        self.column_map = reverse_column_map
+
         def XGB_evaluate(n_estimators, max_depth, max_features):
             # Convert float hyperparameters to integers
             max_depth = int(round(max_depth))
@@ -418,19 +434,8 @@ class bench_mark():
             start_time_total = time.time()
 
             # Train/Test Split
-            X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, test_size=0.33, random_state=42)
+            X_train, X_test, y_train, y_test = train_test_split(self.X_renamed , self.y, test_size=0.33, random_state=42)
 
-
-            #sanitize the names
-            X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
-            X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
-
-            # Drop duplicated columns
-            dups = X_train.columns[X_train.columns.duplicated()].tolist()
-            if dups:
-                print("❗ Duplicated columns dropped:", dups)
-            X_train = X_train.loc[:, ~X_train.columns.duplicated()]
-            X_test = X_test.loc[:, ~X_test.columns.duplicated()]
 
             # Train XGBoost model
             model = xgb.XGBRegressor(**params, n_estimators=n_estimators)
@@ -468,7 +473,7 @@ class bench_mark():
         best_params['max_depth'] = int(best_params['max_depth'])
 
         # Convert cuDF to pandas
-        X_pandas = self.X.to_pandas()
+        X_pandas = self.X_renamed .to_pandas()
         y_pandas = self.y.to_pandas()
 
         # Initialize KFold
@@ -481,18 +486,6 @@ class bench_mark():
             # Split the data into train and test
             X_train, X_test = X_pandas.iloc[train_index], X_pandas.iloc[test_index]
             y_train, y_test = y_pandas.iloc[train_index], y_pandas.iloc[test_index]
-
-
-            # THEN sanitize the names
-            X_train.columns = X_train.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
-            X_test.columns = X_test.columns.astype(str).str.replace(r"[\[\]<>]", "", regex=True).str.replace(" ", "_")
-
-            # Drop duplicated columns first
-            dups = X_train.columns[X_train.columns.duplicated()].tolist()
-            if dups:
-                print("❗ Duplicated columns dropped:", dups)
-            X_train = X_train.loc[:, ~X_train.columns.duplicated()]
-            X_test = X_test.loc[:, ~X_test.columns.duplicated()]
 
             # Retrain model with best hyperparameters
             model = xgb.XGBRegressor(**best_params, tree_method="hist", device="cuda", random_state=42)
@@ -508,22 +501,30 @@ class bench_mark():
             MAPE_met = mean_absolute_errorSK(y_test, y_pred)
             MAE_met = median_absolute_error(y_test, y_pred)
             # plot
-            # Make sure the model is fitted before calling get_booster
+            # Rename features in booster
             booster = model.get_booster()
+            feature_scores = booster.get_score(importance_type='gain')
 
-            # Plot top N features by importance (gain)
+            # Map back to original names
+            feature_scores_readable = {
+                reverse_column_map.get(feat, feat): score
+                for feat, score in feature_scores.items()
+            }
+
+            # Convert to a sorted list of tuples
+            sorted_features = sorted(feature_scores_readable.items(), key=lambda x: x[1], reverse=True)
+
+            # Plot manually using matplotlib
+            top_n = self.top_n
+            top_features = sorted_features[:top_n]
+            labels, gains = zip(*top_features)
+
             plt.figure(figsize=(10, 6))
-            ax = xgb.plot_importance(
-                booster,
-                importance_type='gain',  # Or 'weight' or 'cover'
-                max_num_features= self.top_n,
-                height=0.4,
-                show_values=True,
-                values_format="{v:.2f}",
-                xlabel='Gain',
-                title=f'Top {self.top_n} Important Features (Gain)',
-                grid=True
-            )
+            plt.barh(range(top_n), gains[::-1])
+            plt.yticks(range(top_n), labels[::-1])
+            plt.xlabel("Gain")
+            plt.title(f"Top {top_n} Important Features (Gain)")
+            plt.grid(True)
             plt.tight_layout()
             plt.show()
             self.plot(y_test, y_pred, model_name)
