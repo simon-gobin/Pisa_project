@@ -137,9 +137,10 @@ class bench_mark():
             scaler = StandardScaler()
             X_scaled = scaler.fit_transform(self.X)
 
-            pca = PCA()
-            pca.fit(X_scaled)
-            explained_variance = pca.explained_variance_ratio_
+            # First PCA to get variance explained
+            pca_full = PCA()
+            pca_full.fit(X_scaled)
+            explained_variance = pca_full.explained_variance_ratio_
             explained_variance = cp.asarray(explained_variance.values)
 
             # Plot
@@ -153,9 +154,17 @@ class bench_mark():
             plt.tight_layout()
             plt.show()
 
-            pca = PCA(n_components=0.95)
+            # Check how many components are needed to reach 95% variance
+            cumulative = cp.cumsum(explained_variance)
+            n_components_95 = int(cp.sum(cumulative < 0.95)) + 1
+
+            if n_components_95 < 1:
+                n_components_95 = 1
+
+            # Final PCA transformation
+            pca = PCA(n_components=n_components_95)
             self.X = pca.fit_transform(X_scaled)
-            self.logger.info(f"PCA reduced to {self.X.shape[1]} components...")
+            self.logger.info(f"PCA reduced to {self.X.shape[1]} components (95% variance)")
 
         return self.X
 
