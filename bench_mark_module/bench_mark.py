@@ -130,7 +130,7 @@ class bench_mark():
 
         # Plot the heatmap
         plt.figure(figsize=(15, 12))
-        sns.heatmap(df_top, annot=True, cmap='coolwarm', center=0, fmt=".2f")
+        sns.heatmap(df_top.corr(numeric_only=True), annot=True, cmap='coolwarm', center=0, fmt=".2f")
         plt.title("Feature Correlation Heatmap (Top Correlated Features)")
         plt.show()
 
