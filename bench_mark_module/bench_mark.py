@@ -131,12 +131,6 @@ class bench_mark():
         plt.show()
         plt.savefig('mutliplot_3.jpg')
 
-        # Plot the heatmap
-        plt.figure(figsize=(15, 12))
-        sns.heatmap(df_top.corr(numeric_only=True), annot=True, cmap='coolwarm', center=0, fmt=".2f")
-        plt.title("Feature Correlation Heatmap (Top Correlated Features)")
-        plt.show()
-
         if self.top_feature_reduction is True:
             self.X = self.X[top_features]
 
