@@ -21,8 +21,6 @@ import json
 from cuml.linear_model import ElasticNet
 import cupy as cp
 from sklearn.feature_selection import (f_regression, r_regression, mutual_info_regression)
-import shap
-
 
 from cuml.decomposition import PCA
 from cuml.preprocessing import StandardScaler
@@ -76,14 +74,7 @@ class bench_mark():
         y_panda = self.y.to_pandas()
 
         f_values, P_value = f_regression(X_panda, y_panda)
-
-        #replace mutal info by SHAP
-        xgb_model = xgb.XGBRegressor(n_estimators=50, max_depth=3, learning_rate=0.1, tree_method='hist')
-        xgb_model.fit(self.X, self.y)
-        explainer = shap.Explainer(xgb_model)
-        shap_values = explainer(X_panda)
-        shap_importance = np.abs(shap_values.values).mean(axis=0)
-
+        mutual_info = mutual_info_regression(X_panda, y_panda)
         Correlation = r_regression(X_panda, y_panda)
 
         # Create a DataFrame from the results
@@ -93,7 +84,7 @@ class bench_mark():
             'f_values': f_values,
             'Correlation': Correlation,
             'Correlation abs' : abs(Correlation),
-            'SHAP_importance': shap_importance
+            'Mutual_info': mutual_info
         })
 
         # Sort and get top Correlation
@@ -101,7 +92,7 @@ class bench_mark():
         top_percent_cutoff = int(self.top_features * num_features)
 
         #filter the result for the plot
-        top_features_mutual_info = results_df.nlargest(top_percent_cutoff, 'SHAP_importance')['Feature'].tolist()
+        top_features_mutual_info = results_df.nlargest(top_percent_cutoff, 'Mutual_info')['Feature'].tolist()
         top_features_corr = results_df.nlargest(top_percent_cutoff, 'Correlation abs')['Feature'].tolist()
         top_features_fvalues = results_df.nlargest(top_percent_cutoff, 'f_values')['Feature'].tolist()
         # Combine all top features into one list and remove duplicates
@@ -131,8 +122,8 @@ class bench_mark():
 
 
         plt.subplot(3, 1, 3)
-        sns.barplot(y='SHAP_importance', x='Feature', data=df_top)
-        plt.title('SHAP Importance')
+        sns.barplot(y='Mutual_info', x='Feature', data=df_top)
+        plt.title('Importance Decision Tree')
         plt.xticks(rotation=75)
 
         plt.tight_layout()
