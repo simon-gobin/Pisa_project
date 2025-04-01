@@ -120,18 +120,18 @@ class bench_mark():
         plt.subplot(3, 1, 1)
         sns.barplot(y='f_values', x='Feature', data=df_top)
         plt.title('P-values of Features')
-        plt.xticks(rotation=75)
+        plt.xticks(rotation=75, ha='right')
 
         plt.subplot(3, 1, 2)
         sns.barplot(y='Correlation', x='Feature', data=df_top)
         plt.title('Correlation of Features with Target')
-        plt.xticks(rotation=75)
+        plt.xticks(rotation=75, ha='right')
 
 
         plt.subplot(3, 1, 3)
         sns.barplot(y='SHAP_importance', x='Feature', data=df_top)
         plt.title('SHAP Importance')
-        plt.xticks(rotation=75)
+        plt.xticks(rotation=75, ha='right')
 
         plt.tight_layout()
         plt.show()
