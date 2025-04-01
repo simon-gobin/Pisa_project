@@ -125,7 +125,7 @@ class bench_mark():
 
 
         #plot
-        plt.figure(figsize=(62, 10))
+        plt.figure(figsize=(62, 15))
 
         plt.subplot(3, 1, 1)
         sns.barplot(y='f_values', x='Feature', data=df_top)
@@ -143,6 +143,7 @@ class bench_mark():
         plt.title('SHAP Importance')
         plt.xticks(rotation=75, ha='right')
 
+        plt.subplots_adjust(hspace=0.7)
         plt.tight_layout()
         plt.show()
         plt.savefig('mutliplot_3.jpg')
