@@ -125,7 +125,7 @@ class bench_mark():
 
 
         #plot
-        plt.figure(figsize=(62, 15))
+        plt.figure(figsize=(90, 15))
 
         plt.subplot(3, 1, 1)
         sns.barplot(y='f_values', x='Feature', data=df_top)
