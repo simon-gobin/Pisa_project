@@ -70,18 +70,31 @@ class bench_mark():
         #print(message)  # Commented out to log only to file
 
     def EDA(self):
+
+        #  Rename columns to safe names for XGBoost SHAP
+        column_name_map = {col: f"col_{i}" for i, col in enumerate(self.X.columns)}
+        self.X_renamed = self.X.rename(columns=column_name_map)
+        reverse_column_map = {v: k for k, v in column_name_map.items()}
+
+        # SHAP with safe column names
+        xgb_model = xgb.XGBRegressor(n_estimators=50, max_depth=3, learning_rate=0.1, tree_method='hist')
+        xgb_model.fit(self.X_renamed, self.y)
+        explainer = shap.Explainer(xgb_model)
+        shap_values = explainer(self.X_renamed.to_pandas())  # SHAP needs pandas
+
+        # Compute SHAP importance and map back to original names
+        shap_importance = np.abs(shap_values.values).mean(axis=0)
+        shap_importance_dict = {
+            reverse_column_map[col]: shap_val for col, shap_val in zip(self.X_renamed.columns, shap_importance)
+        }
+        shap_importance_dict = {
+            reverse_column_map[col]: shap_val for col, shap_val in zip(self.X_renamed.columns, shap_importance)
+        }
+
         X_panda = self.X.to_pandas()
         y_panda = self.y.to_pandas()
 
         f_values, P_value = f_regression(X_panda, y_panda)
-
-        #replace mutal info by SHAP
-        xgb_model = xgb.XGBRegressor(n_estimators=50, max_depth=3, learning_rate=0.1, tree_method='hist')
-        xgb_model.fit(self.X, self.y)
-        explainer = shap.Explainer(xgb_model)
-        shap_values = explainer(X_panda)
-        shap_importance = np.abs(shap_values.values).mean(axis=0)
-
         Correlation = r_regression(X_panda, y_panda)
 
         # Create a DataFrame from the results
@@ -91,7 +104,7 @@ class bench_mark():
             'f_values': f_values,
             'Correlation': Correlation,
             'Correlation abs' : abs(Correlation),
-            'SHAP_importance': shap_importance
+            'SHAP_importance': self.X.columns.to_series().map(shap_importance_dict)
         })
 
         # Sort and get top Correlation
