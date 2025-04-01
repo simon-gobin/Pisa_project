@@ -87,9 +87,6 @@ class bench_mark():
         shap_importance_dict = {
             reverse_column_map[col]: shap_val for col, shap_val in zip(self.X_renamed.columns, shap_importance)
         }
-        shap_importance_dict = {
-            reverse_column_map[col]: shap_val for col, shap_val in zip(self.X_renamed.columns, shap_importance)
-        }
 
         X_panda = self.X.to_pandas()
         y_panda = self.y.to_pandas()
