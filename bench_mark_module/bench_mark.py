@@ -540,15 +540,10 @@ class bench_mark():
         reverse_column_map = {v: k for k, v in column_name_map.items()}
         self.column_map = reverse_column_map
 
-        def XGB_evaluate(n_estimators, max_depth, max_features, learning_rate, subsample, gamma)):
+        def XGB_evaluate(n_estimators, max_depth, max_features, learning_rate, subsample, gamma):
             # Convert float hyperparameters to integers
             max_depth = int(round(max_depth))
             n_estimators = int(round(n_estimators))
-
-            # Define additional hyperparameters
-            learning_rate = 0.1
-            subsample = 0.8
-            colsample_bytree = max_features  # Use optimized max_features
 
             # XGBoost parameters
             params = {
