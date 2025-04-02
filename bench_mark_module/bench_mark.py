@@ -300,13 +300,6 @@ class bench_mark():
             times_.append(total_time)
             MAE_.append(MAE_met)
 
-        # Aggregate scores
-        avg_mse = np.mean(mean_absolute_error_)
-        avg_r2 = np.mean(r2_score_scores_)
-        avg_mape = np.mean(MAPE_)
-        avg_mae = np.mean(MAE_)
-        avg_time = np.mean(times_)
-
         print(
             f'Mean squared error = {mean_absolute_error_met:.4f}, R² = {r2_score_met:.4f}, RMSE = {MAPE_met:.4f}, Median AE = {MAE_met:.4f}, Training Time = {total_time:.2f}s')
 
@@ -315,6 +308,7 @@ class bench_mark():
         MAPE_.append(MAPE_met)
         times_.append(total_time)
         MAE_.append(MAE_met)
+
 
     # Calculate mean accuracy across folds
     avg_mse = np.mean(mean_absolute_error_)
