@@ -310,40 +310,40 @@ class bench_mark():
         MAE_.append(MAE_met)
 
 
-    # Calculate mean accuracy across folds
-    avg_mse = np.mean(mean_absolute_error_)
-    avg_r2 = np.mean(r2_score_scores_)
-    avg_rmse = np.mean(MAPE_)
-    avg_mae_median = np.mean(MAE_)
-    avg_time = np.mean(times_)
+        # Calculate mean accuracy across folds
+        avg_mse = np.mean(mean_absolute_error_)
+        avg_r2 = np.mean(r2_score_scores_)
+        avg_rmse = np.mean(MAPE_)
+        avg_mae_median = np.mean(MAE_)
+        avg_time = np.mean(times_)
 
-    print(
-        f"Mean Scores for Cross-Validation: mean_square_error =  {avg_mse:.4f}, r2_score_scores =  {avg_r2:.4f}, "
-        f"MAPE = {avg_rmse:.4f}, MAE = {avg_mae_median:.4f}, time = {avg_time:.2f}")
+        print(
+            f"Mean Scores for Cross-Validation: mean_square_error =  {avg_mse:.4f}, r2_score_scores =  {avg_r2:.4f}, "
+            f"MAPE = {avg_rmse:.4f}, MAE = {avg_mae_median:.4f}, time = {avg_time:.2f}")
 
-    self.results["ElasticNet"] = {
-        "mean_squared_error": avg_mse,
-        "mean_squared_error_min": min(mean_absolute_error_),
-        "mean_squared_error_max": max(mean_absolute_error_),
+        self.results["ElasticNet"] = {
+            "mean_squared_error": avg_mse,
+            "mean_squared_error_min": min(mean_absolute_error_),
+            "mean_squared_error_max": max(mean_absolute_error_),
 
-        "r2_score": avg_r2,
-        "r2_score_min": min(r2_score_scores_),
-        "r2_score_max": max(r2_score_scores_),
+            "r2_score": avg_r2,
+            "r2_score_min": min(r2_score_scores_),
+            "r2_score_max": max(r2_score_scores_),
 
-        "MAPE": avg_rmse,
-        "MAPE_min": min(MAPE_),
-        "MAPE_max": max(MAPE_),
+            "MAPE": avg_rmse,
+            "MAPE_min": min(MAPE_),
+            "MAPE_max": max(MAPE_),
 
-        "MAE": avg_mae_median,
-        "MAE_min": min(MAE_),
-        "MAE_max": max(MAE_),
+            "MAE": avg_mae_median,
+            "MAE_min": min(MAE_),
+            "MAE_max": max(MAE_),
 
-        "training_time": avg_time,
-        "training_time_min": min(times_),
-        "training_time_max": max(times_),
+            "training_time": avg_time,
+            "training_time_min": min(times_),
+            "training_time_max": max(times_),
 
-        "best_params": best_params
-    }
+            "best_params": best_params
+        }
 
 
     def bayesian_optimization_rf(self):
@@ -730,56 +730,41 @@ class bench_mark():
             times_.append(total_time)
             MAE_.append(MAE_met)
 
+
         # Calculate mean accuracy across folds
-        avg_mae = np.mean(mean_absolute_error_)
+        avg_mse = np.mean(mean_absolute_error_)
         avg_r2 = np.mean(r2_score_scores_)
         avg_rmse = np.mean(MAPE_)
         avg_mae_median = np.mean(MAE_)
         avg_time = np.mean(times_)
 
         print(
-            f'Mean squared error = {mean_absolute_error_met:.4f}, R² = {r2_score_met:.4f}, RMSE = {MAPE_met:.4f}, Median AE = {MAE_met:.4f}, Training Time = {total_time:.2f}s')
+            f"Mean Scores for Cross-Validation: mean_square_error =  {avg_mse:.4f}, r2_score_scores =  {avg_r2:.4f}, "
+            f"MAPE = {avg_rmse:.4f}, MAE = {avg_mae_median:.4f}, time = {avg_time:.2f}")
 
-        mean_absolute_error_.append(mean_absolute_error_met)
-        r2_score_scores_.append(r2_score_met)
-        MAPE_.append(MAPE_met)
-        times_.append(total_time)
-        MAE_.append(MAE_met)
+        self.results["XGB"] = {
+            "mean_squared_error": avg_mse,
+            "mean_squared_error_min": min(mean_absolute_error_),
+            "mean_squared_error_max": max(mean_absolute_error_),
 
-    # Calculate mean accuracy across folds
-    avg_mse = np.mean(mean_absolute_error_)
-    avg_r2 = np.mean(r2_score_scores_)
-    avg_rmse = np.mean(MAPE_)
-    avg_mae_median = np.mean(MAE_)
-    avg_time = np.mean(times_)
+            "r2_score": avg_r2,
+            "r2_score_min": min(r2_score_scores_),
+            "r2_score_max": max(r2_score_scores_),
 
-    print(
-        f"Mean Scores for Cross-Validation: mean_square_error =  {avg_mse:.4f}, r2_score_scores =  {avg_r2:.4f}, "
-        f"MAPE = {avg_rmse:.4f}, MAE = {avg_mae_median:.4f}, time = {avg_time:.2f}")
+            "MAPE": avg_rmse,
+            "MAPE_min": min(MAPE_),
+            "MAPE_max": max(MAPE_),
 
-    self.results["XGB"] = {
-        "mean_squared_error": avg_mse,
-        "mean_squared_error_min": min(mean_absolute_error_),
-        "mean_squared_error_max": max(mean_absolute_error_),
+            "MAE": avg_mae_median,
+            "MAE_min": min(MAE_),
+            "MAE_max": max(MAE_),
 
-        "r2_score": avg_r2,
-        "r2_score_min": min(r2_score_scores_),
-        "r2_score_max": max(r2_score_scores_),
+            "training_time": avg_time,
+            "training_time_min": min(times_),
+            "training_time_max": max(times_),
 
-        "MAPE": avg_rmse,
-        "MAPE_min": min(MAPE_),
-        "MAPE_max": max(MAPE_),
-
-        "MAE": avg_mae_median,
-        "MAE_min": min(MAE_),
-        "MAE_max": max(MAE_),
-
-        "training_time": avg_time,
-        "training_time_min": min(times_),
-        "training_time_max": max(times_),
-
-        "best_params": best_params
-    }
+            "best_params": best_params
+        }
     def run_all(self):
         print('Run EDA')
         self.EDA()
