@@ -554,11 +554,14 @@ class bench_mark():
             params = {
                 'tree_method': "hist",
                 'device': "cuda",
+                'eval_metric' : 'rmsle',
                 'random_state' : 42,
                 'max_depth': max_depth,
+                'n_estimators' : n_estimators,
+                'max_features' : max_features,
                 'learning_rate': learning_rate,
                 'subsample': subsample,
-                'colsample_bytree': colsample_bytree
+                'gamma': gamma
             }
             start_time_total = time.time()
 
@@ -567,7 +570,7 @@ class bench_mark():
 
 
             # Train XGBoost model
-            model = xgb.XGBRegressor(**params, n_estimators=n_estimators)
+            model = xgb.XGBRegressor(**params)
             model.fit(X_train, y_train)
 
             # Predict and calculate accuracy
@@ -583,10 +586,16 @@ class bench_mark():
             return score
 
         # Define parameter bounds for Bayesian Optimization
+        num_features = self.X.shape[1]
+        num_rows = self.X.shape[0]
+
         param_bounds = {
-            "n_estimators": (50, 200),
-            "max_depth": (3, 15),
-            "max_features": (0.5, 1.0)
+            "n_estimators": (int(0.2 * num_features), int(1.5 * num_features)),  # dynamic based on features
+            "max_depth": (3, min(20, int(np.log2(num_rows)))),  # dynamic max_depth based on dataset size
+            "max_features": (0.3, 1.0),
+            "learning_rate": (0.01, 0.3),
+            "subsample": (0.5, 1.0),
+            "gamma": (0, 5)
         }
 
         # Perform Bayesian Optimization
