@@ -189,7 +189,7 @@ class bench_mark():
 
 
     @staticmethod
-    def plot(y_test, y_pred, model):
+    def plot(y_test, y_pred, model,r2_score_met ):
         # Compute errors
         errors = y_pred - y_test
         abs_errors = np.abs(errors)
@@ -288,7 +288,7 @@ class bench_mark():
             MAPE_met = mean_absolute_errorSK(y_test, y_pred)
             MAE_met = median_absolute_error(y_test, y_pred)
 
-            self.plot(y_test, y_pred, model_name)
+            self.plot(y_test, y_pred, model_name, r2_score_met)
 
             print(
                 f'Mean squared error = {mean_absolute_error_met:.4f}, R² = {r2_score_met:.4f}, MAPE = {MAPE_met:.4f}, '
@@ -405,7 +405,7 @@ class bench_mark():
             r2_score_met = explained_variance_score(y_test, y_pred)
             MAPE_met = mean_absolute_errorSK(y_test, y_pred)
             MAE_met = median_absolute_error(y_test, y_pred)
-            self.plot(y_test, y_pred, model_name)
+            self.plot(y_test, y_pred, model_name, r2_score_met)
 
             print(
                 f'Mean square error = {mean_absolute_error_met:.4f}, r2_score_met = {r2_score_met}, MAPE_met = {MAPE_met}, Mean absoluterror = {MAE_met}, for training time {total_time: .2f}')
@@ -523,7 +523,7 @@ class bench_mark():
             r2_score_met = explained_variance_score(y_test, y_pred)
             MAPE_met = mean_absolute_errorSK(y_test, y_pred)
             MAE_met = median_absolute_error(y_test, y_pred)
-            self.plot(y_test, y_pred, model_name)
+            self.plot(y_test, y_pred, model_name, r2_score_met)
 
             print(
                 f'Mean square error = {mean_absolute_error_met:.4f}, r2_score_met = {r2_score_met}, MAPE_met = {MAPE_met}, Mean absoluterror = {MAE_met}, for training time {total_time: .2f}')
@@ -703,7 +703,7 @@ class bench_mark():
             plt.grid(True)
             plt.tight_layout()
             plt.show()
-            self.plot(y_test, y_pred, model_name)
+            self.plot(y_test, y_pred, model_name, r2_score_met)
 
             print(
                 f'Mean squared error = {mean_absolute_error_met:.4f}, R² = {r2_score_met:.4f}, RMSE = {MAPE_met:.4f}, Median AE = {MAE_met:.4f}, Training Time = {total_time:.2f}s')
