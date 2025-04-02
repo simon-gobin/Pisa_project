@@ -209,7 +209,7 @@ class bench_mark():
 
         plt.xlabel(f"Student Index {model}")
         plt.ylabel("Score")
-        plt.title(f"Actual vs. Predicted {model}")
+        plt.title(f"Actual vs. Predicted ({model})\nR²: {r2_score_met:.2f}")
         plt.legend()
         plt.show()
 
@@ -312,14 +312,28 @@ class bench_mark():
             f"Mean Scores for ElasticNet CV: MSE = {avg_mse:.4f}, R² = {avg_r2:.4f}, MAPE = {avg_mape:.4f}, MAE = {avg_mae:.4f}, Time = {avg_time:.2f}s")
 
         self.results["ElasticNet"] = {
-            "mean_squared_error": avg_mse,
+            "mean_squared_error": avg_mae,
+            "mean_squared_error_min": min(mean_absolute_error_),
+            "mean_squared_error_max": max(mean_absolute_error_),
+
             "r2_score": avg_r2,
-            "MAPE": avg_mape,
-            "MAE": avg_mae,
+            "r2_score_min": min(r2_score_scores_),
+            "r2_score_max": max(r2_score_scores_),
+
+            "MAPE": avg_rmse,
+            "MAPE_min": min(MAPE_),
+            "MAPE_max": max(MAPE_),
+
+            "MAE": avg_mae_median,
+            "MAE_min": min(MAE_),
+            "MAE_max": max(MAE_),
+
             "training_time": avg_time,
+            "training_time_min": min(times_),
+            "training_time_max": max(times_),
+
             "best_params": best_params
         }
-
     def bayesian_optimization_rf(self):
         model_name = 'Random forest'
         def rf_evaluate(n_estimators, max_depth, max_features):
@@ -414,11 +428,26 @@ class bench_mark():
             f" MAPE = {mean_MAPE:.4f}, MAE = {mean_MAE}, time = {mean_time:.2f}")
 
         self.results["RF"] = {
-            "mean_squared_error": avg_mean_absolute_error,
-            "r2_score": avg_r2_score_scores,
-            "MAPE": mean_MAPE,
-            "MAE": mean_MAE,
-            "training_time": mean_time,
+            "mean_squared_error": avg_mae,
+            "mean_squared_error_min": min(mean_absolute_error_),
+            "mean_squared_error_max": max(mean_absolute_error_),
+
+            "r2_score": avg_r2,
+            "r2_score_min": min(r2_score_scores_),
+            "r2_score_max": max(r2_score_scores_),
+
+            "MAPE": avg_rmse,
+            "MAPE_min": min(MAPE_),
+            "MAPE_max": max(MAPE_),
+
+            "MAE": avg_mae_median,
+            "MAE_min": min(MAE_),
+            "MAE_max": max(MAE_),
+
+            "training_time": avg_time,
+            "training_time_min": min(times_),
+            "training_time_max": max(times_),
+
             "best_params": best_params
         }
 
@@ -517,11 +546,26 @@ class bench_mark():
             f"MAPE = {mean_MAPE:.4f},MAE = {mean_MAE}, time = {mean_time:.2f}")
 
         self.results["SVR"] = {
-            "mean_squared_error": avg_mean_absolute_error,
-            "r2_score": avg_r2_score_scores,
-            "MAPE": mean_MAPE,
-            "MAE": mean_MAE,
-            "training_time": mean_time,
+            "mean_squared_error": avg_mae,
+            "mean_squared_error_min": min(mean_absolute_error_),
+            "mean_squared_error_max": max(mean_absolute_error_),
+
+            "r2_score": avg_r2,
+            "r2_score_min": min(r2_score_scores_),
+            "r2_score_max": max(r2_score_scores_),
+
+            "MAPE": avg_rmse,
+            "MAPE_min": min(MAPE_),
+            "MAPE_max": max(MAPE_),
+
+            "MAE": avg_mae_median,
+            "MAE_min": min(MAE_),
+            "MAE_max": max(MAE_),
+
+            "training_time": avg_time,
+            "training_time_min": min(times_),
+            "training_time_max": max(times_),
+
             "best_params": best_params
         }
 
@@ -540,7 +584,7 @@ class bench_mark():
         reverse_column_map = {v: k for k, v in column_name_map.items()}
         self.column_map = reverse_column_map
 
-        def XGB_evaluate(n_estimators, max_depth, max_features, learning_rate, subsample, gamma):
+        def XGB_evaluate(n_estimators, max_depth, colsample_bytree, learning_rate, subsample, gamma):
             # Convert float hyperparameters to integers
             max_depth = int(round(max_depth))
             n_estimators = int(round(n_estimators))
@@ -553,7 +597,7 @@ class bench_mark():
                 'random_state' : 42,
                 'max_depth': max_depth,
                 'n_estimators' : n_estimators,
-                'max_features' : max_features,
+                'colsample_bytree': colsample_bytree,
                 'learning_rate': learning_rate,
                 'subsample': subsample,
                 'gamma': gamma
@@ -587,7 +631,7 @@ class bench_mark():
         param_bounds = {
             "n_estimators": (int(0.2 * num_features), int(1.5 * num_features)),  # dynamic based on features
             "max_depth": (3, min(20, int(np.log2(num_rows)))),  # dynamic max_depth based on dataset size
-            "max_features": (0.3, 1.0),
+            "colsample_bytree": (0.3, 1.0),
             "learning_rate": (0.01, 0.3),
             "subsample": (0.5, 1.0),
             "gamma": (0, 5)
@@ -684,13 +728,27 @@ class bench_mark():
 
         self.results["XGB"] = {
             "mean_squared_error": avg_mae,
+            "mean_squared_error_min": min(mean_absolute_error_),
+            "mean_squared_error_max": max(mean_absolute_error_),
+
             "r2_score": avg_r2,
+            "r2_score_min": min(r2_score_scores_),
+            "r2_score_max": max(r2_score_scores_),
+
             "MAPE": avg_rmse,
+            "MAPE_min": min(MAPE_),
+            "MAPE_max": max(MAPE_),
+
             "MAE": avg_mae_median,
+            "MAE_min": min(MAE_),
+            "MAE_max": max(MAE_),
+
             "training_time": avg_time,
+            "training_time_min": min(times_),
+            "training_time_max": max(times_),
+
             "best_params": best_params
         }
-
     def run_all(self):
         print('Run EDA')
         self.EDA()
