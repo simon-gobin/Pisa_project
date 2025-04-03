@@ -765,6 +765,7 @@ class bench_mark():
 
             "best_params": best_params
         }
+
     def run_all(self):
         print('Run EDA')
         self.EDA()
@@ -783,6 +784,27 @@ class bench_mark():
             print(f"{model}")
             for metric, value in metrics.items():
                 print(f" {metric}: {value}")
+
+        # Metrics to compare
+        metrics = ['mean_squared_error', 'r2_score', 'MAE', 'MAPE', 'training_time']
+        data = []
+
+        # Collect data for plotting
+        for model, scores in self.results.items():
+            row = [model] + [scores[m] for m in metrics]
+            data.append(row)
+
+        # Convert to DataFrame
+        df = pd.DataFrame(data, columns=['Model'] + metrics)
+        df_melted = df.melt(id_vars='Model', var_name='Metric', value_name='Score')
+
+        # Plot
+        plt.figure(figsize=(12, 6))
+        sns.barplot(data=df_melted, x='Metric', y='Score', hue='Model')
+        plt.title('Model Comparison Across Metrics')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.show()
 
     def save_results(self, filename="benchmark_results.json"):
         with open(filename, "w") as f:
