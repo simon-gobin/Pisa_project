@@ -468,6 +468,7 @@ class bench_mark():
         model_name = 'SVR'
         def svr_evaluate(C, epsilon, gamma):
             params = {
+                'kernel': 'rbf',
                 'C': float(C),
                 'epsilon': float(epsilon),
                 'gamma' : float(gamma)
@@ -494,7 +495,6 @@ class bench_mark():
 
         # Define parameter bounds for Bayesian Optimization
         param_bounds = {
-            'kernel' : 'rbf',
             "C": (0.1, 10),
             "epsilon": (0.01, 1),
             'gamma': (0.1, 1)
