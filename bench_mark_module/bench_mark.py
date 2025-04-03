@@ -785,26 +785,29 @@ class bench_mark():
             for metric, value in metrics.items():
                 print(f" {metric}: {value}")
 
-        # Metrics to compare
+        # Metrics to visualize
         metrics = ['mean_squared_error', 'r2_score', 'MAE', 'MAPE', 'training_time']
         data = []
 
-        # Collect data for plotting
         for model, scores in self.results.items():
-            row = [model] + [scores[m] for m in metrics]
+            row = {'Model': model}
+            for metric in metrics:
+                row[metric] = scores[metric]
             data.append(row)
 
         # Convert to DataFrame
-        df = pd.DataFrame(data, columns=['Model'] + metrics)
-        df_melted = df.melt(id_vars='Model', var_name='Metric', value_name='Score')
+        df = pd.DataFrame(data)
 
-        # Plot
-        plt.figure(figsize=(12, 6))
-        sns.barplot(data=df_melted, x='Metric', y='Score', hue='Model')
-        plt.title('Model Comparison Across Metrics')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.show()
+        # Plot one chart per metric
+        for metric in metrics:
+            plt.figure(figsize=(8, 4))
+            sns.barplot(data=df, x='Model', y=metric, palette="viridis")
+            plt.title(f'{metric} Comparison Across Models')
+            plt.ylabel(metric.replace("_", " ").title())
+            plt.xlabel('Model')
+            plt.tight_layout()
+            plt.grid(axis='y')
+            plt.show()
 
     def save_results(self, filename="benchmark_results.json"):
         with open(filename, "w") as f:
