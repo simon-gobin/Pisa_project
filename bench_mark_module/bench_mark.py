@@ -804,7 +804,7 @@ class bench_mark():
         # Plot one chart per metric
         for metric in metrics:
             plt.figure(figsize=(8, 4))
-            sns.barplot(data=df, x='Model', y=metric, palette="viridis")
+            sns.barplot(data=df, x='Model', y=metric)
             plt.title(f'{metric} Comparison Across Models')
             plt.ylabel(metric.replace("_", " ").title())
             plt.xlabel('Model')
