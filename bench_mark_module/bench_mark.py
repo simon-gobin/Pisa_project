@@ -481,7 +481,7 @@ class bench_mark():
             X_test = X_test.astype('float32')
             y_train = y_train.astype('float32')
             y_test = y_test.astype('float32')
-            model = SVR(**params, kernel='rbf', gamma='scale')
+            model = SVR(**params)
             model.fit(X_train, y_train)
 
             # Predict and calculate accuracy
