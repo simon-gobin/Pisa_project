@@ -466,12 +466,12 @@ class bench_mark():
 
     def bayesian_optimization_SVR(self):
         model_name = 'SVR'
-        def svr_evaluate(C, epsilon, gamma):
+        def svr_evaluate(C, epsilon):
             params = {
                 'kernel': 'rbf',
                 'C': float(C),
                 'epsilon': float(epsilon),
-                'gamma' : float(gamma)
+                'gamma' : 'scale'
             }
 
             start_time_total = time.time()
@@ -496,8 +496,7 @@ class bench_mark():
         # Define parameter bounds for Bayesian Optimization
         param_bounds = {
             "C": (0.1, 10),
-            "epsilon": (0.01, 1),
-            'gamma': (0.1, 1)
+            "epsilon": (0.01, 1)
         }
 
         # Perform Bayesian Optimization
